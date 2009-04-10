@@ -28,14 +28,14 @@
     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
     OF THE POSSIBILITY OF SUCH DAMAGE.
    
-    Author: Pieter Hooimeijer
+    Author: Pieter Hooimeijer 
 *)
 
 open Interface
 
 let header   = "# Decision Procedure for Regular Language Equations" ^        
   "\n# Copyright (c) 2008-2009, University of Virginia"
- let revision = "$Revision: 258 $"
+ let revision = "$Revision$"
 
 let printerror s =
   Printf.printf "# Error: %s\n" s;
