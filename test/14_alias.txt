@@ -1,0 +1,26 @@
+# L(c1) = qr* 
+c1 < [ s: a
+            f: b 
+            d: a -> b on { 'q' }
+               b -> b on { 'r' } 
+          ];
+
+# L(c2) = rrs
+c2 < [ s: c
+            f: f
+            d: c -> d on { 'r' }
+               d -> e on { 'r' }
+	       e -> f on { 's' }
+          ];
+
+# L(c3) = qr*s
+c3 < [ s: g
+            f: i
+            d: g -> h on { 'q' }
+               h -> h on { 'r' }
+               h -> i on { 's' }];
+
+v9 alias c1 . c2;
+v9 < c3;
+
+solve();

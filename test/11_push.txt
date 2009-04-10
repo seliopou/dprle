@@ -1,0 +1,15 @@
+A < [ s: a
+           f: b
+           d: a -> b on {'w'}];
+
+B < [ s: d
+           f: e
+           d: d -> e on {'w'}];
+
+C < A;
+C < B;
+
+push();
+solve();
+pop();
+solve();

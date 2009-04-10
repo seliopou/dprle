@@ -1,0 +1,29 @@
+m1 < [ s: a 
+            f: b 
+	    d: a -> b on { 'a' } ];
+
+m2 < [ s: c
+            f: d
+            d: c -> d on { 'b' } ];
+
+m3 < [ s: e
+            f: f
+            d: e -> f on { 'c' } ];
+
+s1 < [ s: g
+            f: i
+            d: g -> h on { 'a' }
+               h -> i on { 'b' } ];
+
+s2 < [ s: j
+            f: l
+            d: j -> k on { 'b' }
+               k -> l on { 'c' } ];
+
+m1 . m2 < s1;
+m2 . m3 < s2;
+
+solve_all();
+
+
+             

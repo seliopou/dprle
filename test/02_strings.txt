@@ -1,0 +1,13 @@
+push();
+A < [ s: a
+           f: b
+           d: a -> b on epsilon ];
+solve();
+pop();
+A < [ s: a
+           f: b
+           d: a -> b on {'.'}
+           b -> a on {'a'}];
+
+solve ();
+strings();

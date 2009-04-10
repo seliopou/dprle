@@ -1,0 +1,7 @@
+A < [ s: a
+           f: b
+           d: a -> b on epsilon ];
+push();
+solve();
+pop();
+solve_all();

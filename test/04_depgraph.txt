@@ -1,0 +1,14 @@
+# a comment
+c1 < [ s: a
+            f: b 
+            d: a -> b on  epsilon];
+
+c2 < [ s: p
+            f: q
+            d: p -> q on { 'd' }];
+
+s1 < c1;
+s1 < v2;
+
+solve();
+shows();

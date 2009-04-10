@@ -1,0 +1,43 @@
+# Sigma = 'q' 'r' 's' 't'
+
+# L(c1) = qr* 
+c1 < [ s: a
+            f: b 
+            d: a -> b on { 'q' }
+               b -> b on { 'r' } 
+          ];
+
+# L(c2) = rrs
+c2 < [ s: c
+            f: f
+            d: c -> d on { 'r' }
+               d -> e on { 'r' }
+	       e -> f on { 's' }
+          ];
+
+# L(c3) = qr*s
+c3 < [ s: g
+            f: i
+            d: g -> h on { 'q' }
+               h -> h on { 'r' }
+               h -> i on { 's' }];
+
+# L(c4) = t*
+c4 < [ s: j
+            f: j
+            d: j -> j on { 't' }];
+
+# L(c5) = qrrst
+c5 < [ s: k
+            f: p
+            d: k -> l on { 'q' }
+               l -> m on { 'r' }
+               m -> n on { 'r' }
+               n -> o on { 's' }
+               o -> p on { 't' }];
+
+c1 . c2      < c3;
+c1 . c2 . c4 < c5;
+   
+solve();
+show();

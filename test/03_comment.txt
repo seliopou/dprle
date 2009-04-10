@@ -1,0 +1,14 @@
+# comment
+   # more comment
+
+A < [ s: a
+           f: b # some comment
+           d: a -> b on  # epic comment
+
+      epsilon];
+
+# more comment
+
+solve();
+
+# comment without newline

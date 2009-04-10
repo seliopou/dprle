@@ -1,0 +1,9 @@
+a < [ s: a  f: b d: a -> c on { 'a', 'b'}
+                         c -> b on { 'a' }
+                         b -> c on epsilon ];
+b < [ s: a f: b d: a -> b on epsilon
+                        a -> b on {'a'}];
+a.b < [s: a f: b d: a-> c on {'a'}
+                         c -> d on {'a'}
+                         d -> b on {'a'}];
+solve_all();

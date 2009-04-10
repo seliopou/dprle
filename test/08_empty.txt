@@ -1,0 +1,6 @@
+a < [ s: a
+           f: b
+           d: ];
+
+solve();
+strings();

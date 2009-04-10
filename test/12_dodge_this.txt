@@ -1,0 +1,38 @@
+# Sigma = 'q' 'r' 's'
+
+# L(c1) = q(rr)+ 
+c1 < [ s: a
+            f: d 
+            d: a -> b on { 'q' }
+               b -> c on { 'r' }
+               c -> d on { 'r' } 
+               d -> b on epsilon
+          ];
+
+# L(c2) = (rrr)+s
+c2 < [ s: e
+            f: i
+            d: e -> f on { 'r' }
+               f -> g on { 'r' }
+               g -> h on { 'r' }
+               h -> i on { 's' }
+               h -> f on epsilon
+          ];
+
+# L(c3) = q(rrrrr)+s
+c3 < [ s: a
+            f: h
+            d: a -> b on { 'q' }
+               b -> c on { 'r' }
+               c -> d on { 'r' }
+               d -> e on { 'r' }
+               e -> f on { 'r' }
+               f -> g on { 'r' }
+	       g -> b on epsilon
+               g -> h on { 's' }];  
+
+# q(rr)+(rrr)+s intersect q(rrrrr)+s 
+c1 . c2 < c3;
+
+solve_all();
+

@@ -1,0 +1,27 @@
+v1 < [s: q0 f: q4
+             d: q0 -> q1 on { 'x' }
+                q1 -> q2 on { 'y' }
+                q2 -> q3 on { 'y' }
+                q3 -> q4 on epsilon 
+                q3 -> q1 on epsilon 
+            ];
+
+v2 < [s: q0 f: q3
+             d: q0 -> q1 on { 'y' }
+                q1 -> q2 on { 'y' }
+		q0 -> q2 on epsilon
+                q2 -> q3 on { 'z' }
+            ];
+
+v1 . v2 < [s: q0 f: q4
+                  d: q0 -> q1 on { 'x' }
+                     q1 -> q2 on { 'y' }
+                     q2 -> q3 on { 'y' }
+                     q3 -> q4 on { 'z' } 
+                     q3 -> q5 on { 'y' }
+                     q5 -> q6 on { 'y' }
+                     q6 -> q4 on { 'z' }
+                 ];
+
+solve_all();
+                  
