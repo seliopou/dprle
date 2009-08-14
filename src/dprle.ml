@@ -35,7 +35,7 @@ open Interface
 
 let header   = "# Decision Procedure for Regular Language Equations" ^        
   "\n# Copyright (c) 2008-2009, University of Virginia"
- let revision = "$Revision$"
+let revision = "$Revision$"
 
 let printerror s =
   Printf.printf "# Error: %s\n" s;

@@ -194,7 +194,9 @@ let group_concat (graph : graph)
       | Machine m -> 	  
 	  (m, [( ntl(), node.id, ntl() )])
       | SuperMachine (m, trans) -> 
-	  (m, trans)
+	  let lhssomething = match List.hd trans with (x, _, _) -> x in
+	  let rhssomething = match List.hd (List.rev trans) with (_,_,x) -> x in
+	  (m, (lhssomething, node.id, rhssomething)::trans)
       | SubMachine (m,_) -> 
 	  (m, [( ntl(), node.id, ntl() )]) in
 
@@ -252,6 +254,7 @@ let group_concat (graph : graph)
     | SubMachine (_, table) ->
 	Hashtbl.replace table target (left,right);
 	Hashtbl.remove table lhs;
+	Hashtbl.remove table rhs
     | _ -> raise (IllegalLangOp "group_concat > machine_to_sub") in
 
   let lhs_node    = find_node graph lhs in
