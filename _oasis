@@ -1,0 +1,51 @@
+OASISFormat: 0.3
+Name:        dprle
+Version:     0.5.1
+Synopsis:    DPRLE decision procedure for systems of equations that consist of
+             regular languages, concatenation, and grounded subset constraints.
+Authors:     University of Virginia
+License:     BSD3
+Plugins:     META (0.3), StdFiles (0.3), DevFiles (0.3)
+BuildTools:
+  ocamlbuild,
+  ocamldoc
+
+XStdFilesREADME: False
+XStdFilesAUTHORS: False
+
+Flag installexec
+  Description: install the Frenetic executable
+  Default: False
+
+Library dprle
+  Path: src
+  Modules:
+    Options,
+    Hashset,
+    Charset,
+    Nfa,
+    Depgraph,
+    Languageops,
+    Solve,
+    Interface,
+    Dprle
+
+Executable dprle
+  Path: src
+  Install$: flag(installexec)
+  MainIs: dprle.ml
+
+Document doc
+  Title: DPrle
+  Type: ocamlbuild (0.3)
+  XOCamlBuildPath: src
+  XOCamlBuildModules:
+    Options,
+    Hashset,
+    Charset,
+    Nfa,
+    Depgraph,
+    Languageops,
+    Solve,
+    Interface,
+    Dprle
