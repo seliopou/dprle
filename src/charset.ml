@@ -71,6 +71,7 @@ let mem   : set -> int -> bool = Hashset.mem
 let size  : set -> int  = Hashset.size
 let empty : set -> bool = Hashset.empty
 let iter  : (int -> unit) -> set -> unit = Hashset.iter
+let fold  : (int -> 'a) -> set -> 'a = Hashset.fold
 let add   : set -> int -> unit = Hashset.add
 let remove : set -> int -> unit = Hashset.remove
 let minus : set -> set -> set = Hashset.minus

@@ -1,6 +1,6 @@
 # OASIS_START
-# DO NOT EDIT (digest: 220d1c63ab6319a4bdaba150a846f45e)
-version = "0.5.1"
+# DO NOT EDIT (digest: 937c8999d23f11e311b3edd087f65ea6)
+version = "0.6.0"
 description =
 "DPRLE decision procedure for systems of equations that consist of regular languages, concatenation, and grounded subset constraints."
 archive(byte) = "dprle.cma"

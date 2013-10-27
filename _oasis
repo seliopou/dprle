@@ -1,6 +1,6 @@
 OASISFormat: 0.3
 Name:        dprle
-Version:     0.5.1
+Version:     0.6.0
 Synopsis:    DPRLE decision procedure for systems of equations that consist of
              regular languages, concatenation, and grounded subset constraints.
 Authors:     University of Virginia
