@@ -1,4 +1,5 @@
 _build/
 dprle.byte
 setup.log
+setup.data
 .*.sw[po]
