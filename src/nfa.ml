@@ -820,14 +820,26 @@ let simple_concat (m1 : nfa)
 
 
 (** Applicative NFA union
+    @param p1 A subset of [m1.q]
+    @param p2 A subset of [m2.q]
     @param a An NFA (unchanged)
     @param b Another NFA (unchanged)
-    @return An NFA that accepts [L(a) cup L(b)]
+    @return A tree-tuple [(p1', p2', m3)] So that [m3] is an NFA with
+    language [L(m3) = L(m1) cup L(m2)]; [p1'] subset [m3.q] is the
+    set of states that correspond to states in [p1]; and [p2'] subset
+    [m3.q] is the set of states that correspond to states in
+    [p2]. (Note: for the current union implementation, [p1 = p1'] for
+    all calls to union).
 *)
 let union (a : nfa)
-          (b : nfa) : nfa =
+          (b : nfa)
+          (p1 : state hashset)
+          (p2 : state hashset) : ((state, state) Hashtbl.t *
+				(state, state) Hashtbl.t * nfa) =
   let offset = a.next_q in
   let convert x = x + offset in
+  let lhs = fmap p1 (fun x -> x) in
+  let rhs = fmap p2 convert in
   let q = copy a.q in
   let _ = iter (fun m2q -> add q (convert m2q)) b.q in
   let delta = Hashtbl.create (Hashtbl.length a.delta + Hashtbl.length b.delta) in
@@ -846,7 +858,16 @@ let union (a : nfa)
     add_trans result (convert b.f) Epsilon newfinal;
     result.s <- newstart;
     result.f <- newfinal;
-    result
+    (lhs, rhs, result)
+
+(** Applicative NFA union without the state-converting frills
+    @param a An NFA (unchanged)
+    @param b Another NFA (unchanged)
+    @return An NFA that accepts [L(a) cup L(b)]
+*)
+let simple_union (m1 : nfa)
+                 (m2 : nfa) : nfa =
+  let _,_,m = union m1 m2 (create 0) (create 0) in m
 
 
 (** Annotated NFA intersection using the cross-product construction
@@ -957,7 +978,7 @@ let nfa_eq (a : nfa) (b : nfa) : bool =
   let bbar = nfa_to_dfa b in
   let _ = complement bbar in
   let cap = simple_intersect in
-  let cup = union in
+  let cup = simple_union in
   let big = cup (cap a bbar) (cap abar b) in
     is_empty big
 
