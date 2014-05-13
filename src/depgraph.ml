@@ -161,9 +161,9 @@ let new_node (graph : graph)
              (id    : nodeid)
              (lang  : lang) : node =
   let newnode = { id = id;
-		  lang = lang;
-		  inb  = Hashtbl.create 10;
-		  outb = Hashtbl.create 10 } in
+          lang = lang;
+          inb  = Hashset.create 10;
+          outb = Hashset.create 10 } in
     Hashtbl.replace graph id newnode;
     newnode
 
@@ -173,14 +173,14 @@ let new_node (graph : graph)
 *)
 let copy_graph (graph : graph) : graph = 
   let newgraph = Hashtbl.create (Hashtbl.length graph) in
-  let copy_node n = 
-    { n with outb = Hashtbl.copy n.outb;
-	     inb  = Hashtbl.copy n.inb;
-	     lang = match n.lang with 
-	       | Machine x -> Machine (Nfa.copy_nfa x) 
-	       | SubMachine (m, l) -> SubMachine (Nfa.copy_nfa m, Hashtbl.copy l)
-	       | SuperMachine (m, trans) -> SuperMachine (Nfa.copy_nfa m, trans)
-	       | Unrestricted -> Unrestricted }
+  let copy_node n =
+    { n with outb = Hashset.copy n.outb;
+         inb  = Hashset.copy n.inb;
+         lang = match n.lang with
+           | Machine x -> Machine (Nfa.copy_nfa x)
+           | SubMachine (m, l) -> SubMachine (Nfa.copy_nfa m, Hashtbl.copy l)
+           | SuperMachine (m, trans) -> SuperMachine (Nfa.copy_nfa m, trans)
+           | Unrestricted -> Unrestricted }
   in
   let copy_mapping id node = 
     Hashtbl.replace newgraph id (copy_node node) 
