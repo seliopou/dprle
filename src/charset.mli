@@ -11,7 +11,7 @@ val digit_list_to_int : string -> int
 
 (* Set Creation *)
 val create_empty : unit -> set
-val create_full : unit -> set
+val create_full  : int -> set
 
 (* Set Operations *)
 

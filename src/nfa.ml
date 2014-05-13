@@ -70,7 +70,8 @@ type nfa = {
   mutable delta     : state delta;
   mutable epsilon   : state epsilon;
   mutable q         : state hashset;
-  mutable next_q    : state
+  mutable next_q    : state;
+  mutable alpha_size : int
 }
 
 (** {6 Basic transition function handling} *)
@@ -209,20 +210,20 @@ let fmap set f =
     @param f Final state
     @return An NFA consisting of states [s] and [f], with no transitions.
 *)
-let new_nfa_states (s : state) 
-                   (f : state) : nfa =
+let new_nfa_states ?(alpha_size = 256) (s : state) (f : state) : nfa =
   let d = Hashtbl.create def_machine_size in
   let e = Hashtbl.create def_machine_size in
   let q = create def_machine_size in
-    add q s;
-    add q f;
-    { s = s;
-      f = f;
-      delta   = d;
-      epsilon = e;
-      q = q;
-      next_q = max (s + 1) (f + 1)
-    }
+  add q s;
+  add q f;
+  { s = s;
+    f = f;
+    delta   = d;
+    epsilon = e;
+    q = q;
+    next_q = max (s + 1) (f + 1);
+    alpha_size = alpha_size
+  }
 
 
 (** Add a new state
@@ -271,7 +272,7 @@ let add_all_trans (nfa : nfa)
 	          (s2  : state) : unit =
   add_state nfa s1;
   add_state nfa s2;
-  let new_set = Charset.create_full () in
+  let new_set = Charset.create_full nfa.alpha_size in
   let curmap = all_delta nfa.delta s1 in
     Hashtbl.replace curmap s2 new_set
 
@@ -641,7 +642,9 @@ let normalize_nfa (nfa : nfa)
     delta = delta;
     epsilon = epsilon;
     q = q;
-    next_q = !curq}
+    next_q = !curq;
+    alpha_size = nfa.alpha_size
+  }
 
 
 (* (\** Annotated NFA intersection using cross-product construction. *)
@@ -722,7 +725,7 @@ let nfa_to_dfa (n : nfa) : nfa =
 	res
   in (* TODO: some inline comments might help here *)
   let _ = dfa.s <- (convert (eps_closure n n.s)) in
-  let bigsigma = Charset.create_full () in
+  let bigsigma = Charset.create_full n.alpha_size in
   let _ = add_all_trans dfa sink_state sink_state in
   let process_state (q : stateset) : stateset list = 
     let all_outbound = ref (Charset.create_empty ()) in
@@ -822,7 +825,7 @@ let concat (a  : nfa)
   let _ = copy_set a.epsilon epsilon (fun x -> x) in
   let _ = copy_set b.epsilon epsilon convert in
   let result = { s = a.s; f = (convert b.f); delta = delta; epsilon = epsilon; q = q;
-	         next_q = a.next_q + b.next_q } in
+                 next_q = a.next_q + b.next_q ; alpha_size = a.alpha_size + b.alpha_size} in
   let curset = which_states epsilon a.f in
   let _ = add curset (convert b.s) in
     (lhs, rhs, result)
@@ -868,7 +871,7 @@ let union (a : nfa)
   let _ = copy_set a.epsilon epsilon (fun x -> x) in
   let _ = copy_set b.epsilon epsilon convert in
   let result = { s = 0; f = 0; delta = delta; epsilon = epsilon; q = q;
-	         next_q = a.next_q + b.next_q } in
+                 next_q = a.next_q + b.next_q ; alpha_size = a.alpha_size + b.alpha_size} in
   let newstart = new_state result in
   let newfinal = new_state result in
     add_trans result newstart Epsilon a.s;
