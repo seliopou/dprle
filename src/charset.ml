@@ -66,19 +66,19 @@ let create_full () : set =
     for i = 0 to 255 do Hashset.add ret i done;
     ret
 
-let copy  : set -> set  = Hashset.copy
-let mem   : set -> int -> bool = Hashset.mem
-let size  : set -> int  = Hashset.size
-let empty : set -> bool = Hashset.empty
-let iter  : (int -> unit) -> set -> unit = Hashset.iter
-let fold  : (int -> 'a) -> set -> 'a = Hashset.fold
-let add   : set -> int -> unit = Hashset.add
-let remove : set -> int -> unit = Hashset.remove
-let minus : set -> set -> set = Hashset.minus
-let cup : set -> set -> set = Hashset.cup
-let cap : set -> set -> set = Hashset.cap
-let choose : set -> int = Hashset.choose
-let from_list : int list -> set = Hashset.from_list
+let copy = Hashset.copy
+let mem  = Hashset.mem
+let size = Hashset.size
+let empty = Hashset.empty
+let iter  = Hashset.iter
+let fold  = Hashset.fold
+let add   = Hashset.add
+let remove = Hashset.remove
+let minus  = Hashset.minus
+let cup  = Hashset.cup
+let cap  = Hashset.cap
+let choose  = Hashset.choose
+let from_list = Hashset.from_list
 
 let print_charset (s : set) = 
   if size s > 126 then

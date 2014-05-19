@@ -65,13 +65,14 @@ let intersect sourceid targetid =
 
 let named_concat lhs rhs target =
   let thenode = Depgraph.find_node (cur_graph ()) target in
-  let count = Hashtbl.fold (fun edge _ acc -> match edge with 
-			      | InConcat(_,_) -> acc + 1
-			      | _ -> acc) thenode.inb 0 in
-    if count > 0 then
-      raise CantAlias
-    else
-      Depgraph.add_concat (cur_graph()) lhs rhs target
+  let count = Hashset.fold (fun edge acc -> match edge with
+    | InConcat(_,_) -> acc + 1
+    | _ -> acc) thenode.inb 0 in
+  if count > 0 then
+    raise CantAlias
+  else
+    Depgraph.add_concat (cur_graph()) lhs rhs target
+
 
 let anon_concat lhs rhs target =
   new_node target Unrestricted;
@@ -186,7 +187,7 @@ let select n =
 
 let issubset (lhs : nodeid) (rhs : nodeid) : unit =
   let graph = cur_graph () in
-  let has_inbound x = Hashtbl.length x.inb > 0 in
+  let has_inbound x = Hashset.size x.inb > 0 in
   let lhs_node = try Hashtbl.find graph lhs with Not_found -> raise (BadIdent lhs) in
   let rhs_node = try Hashtbl.find graph rhs with Not_found -> raise (BadIdent rhs) in
     if has_inbound lhs_node then
@@ -201,7 +202,7 @@ let issubset (lhs : nodeid) (rhs : nodeid) : unit =
 
 let areequal (lhs : nodeid) (rhs : nodeid) : unit =
   let graph = cur_graph () in
-  let has_inbound x = Hashtbl.length x.inb > 0 in
+  let has_inbound x = Hashset.size x.inb > 0 in
   let lhs_node = try Hashtbl.find graph lhs with Not_found -> raise (BadIdent lhs) in
   let rhs_node = try Hashtbl.find graph rhs with Not_found -> raise (BadIdent rhs) in
   let lhs_lang, rhs_lang = lhs_node.lang, rhs_node.lang in
@@ -222,7 +223,7 @@ let all_nodes (graph : graph) : nodeid list =
     Hashtbl.fold handle_node graph []
 
 let gen_strings (ids : nodeid list) : unit =
-  let has_inbound x = Hashtbl.length x.inb > 0 in
+  let has_inbound x = Hashset.size x.inb > 0 in
   let graph = cur_graph () in
 
   let ids = match ids with 

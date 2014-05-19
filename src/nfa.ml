@@ -148,7 +148,7 @@ let which_states ?(create = true)
       (Hashset.create 0)
 
 
-(** Copy a delta or epsilon, applying a transformation to each element 
+(** Copy a delta, applying a transformation to each element
     @param s Source
     @param t Target
     @param f transformation 
@@ -169,6 +169,21 @@ let copy_table (s : ('p, ('p, 'q) Hashtbl.t) Hashtbl.t)
 	      Hashtbl.replace old_map (f s2) cs
 	   ) m
     ) s 
+
+(** Copy an epsilon, applying a transformation to each element
+    @param s Source
+    @param t Target
+    @param f transformation
+*)
+let copy_set (s : ('p, 'p hashset) Hashtbl.t)
+             (t : ('r, 'r hashset) Hashtbl.t)
+             (f : 'p -> 'r) =
+  Hashtbl.iter (fun key set ->
+    let new_key = f key in
+    let new_set = Hashset.create def_eps_size in
+    Hashset.iter (fun el -> Hashset.add new_set (f el) ) set;
+    Hashtbl.replace t new_key new_set
+  ) s
 
 (** For all mappings [p -> q] in hashtable [a] and for all [r -> s] in
     hashtable [b], execute [f p q r s]. Used by {!intersect}
@@ -350,9 +365,10 @@ let neighbors (nfa : nfa)
   let d_rhs = all_delta ~create:false nfa.delta q in
   let state_list = Hashtbl.fold (fun state _ acc -> state::acc) d_rhs [] in
   let e_rhs = which_states ~create:false nfa.epsilon q in
-  let new_state_list = 
-    Hashtbl.fold (fun state _ acc -> state::acc) e_rhs state_list in
-    new_state_list
+  let new_state_list =
+    Hashset.fold (fun state acc -> state::acc) e_rhs state_list in
+  new_state_list
+
 
 (** We use integer sets for the epsilon closure; this is vaguely
     because we do a lot of comparing between closures *)
@@ -454,16 +470,18 @@ let forward_fold_nfa (f   : state -> 'a -> 'a)
 let backward_mapping (nfa : nfa) : (state, state hashset) Hashtbl.t =
   let mapping = Hashtbl.create (size nfa.q) in
   let map s1 s2 =
-    let theset = try Hashtbl.find mapping s2 with Not_found -> 
-      let newset = create (def_delta_size + def_eps_size) in
-	Hashtbl.replace mapping s2 newset; newset
-    in
-      add theset s1
-  in
-  let add_it s1 s2 _ = map s1 s2 in
-    Hashtbl.iter (fun s1 rhs -> Hashtbl.iter (add_it s1) rhs) nfa.delta;
-    Hashtbl.iter (fun s1 rhs -> Hashtbl.iter (add_it s1) rhs) nfa.epsilon;
-    mapping
+    let theset = try Hashtbl.find mapping s2
+      with Not_found ->
+        let newset = create (def_delta_size + def_eps_size) in
+        Hashtbl.replace mapping s2 newset; newset in
+    add theset s1 in
+
+  let add_it s1 s2 = map s1 s2 in
+  let add_it' s1 s2 _ = map s1 s2 in
+  Hashtbl.iter (fun s1 rhs -> Hashtbl.iter (add_it' s1) rhs) nfa.delta;
+  Hashtbl.iter (fun s1 rhs -> Hashset.iter (add_it s1) rhs) nfa.epsilon;
+  mapping
+
 
 
 (** Backward reachability from a specified state
@@ -562,11 +580,11 @@ let copy_nfa (nfa : nfa) : nfa =
   let delta   = Hashtbl.create (Hashtbl.length nfa.delta) in
   let epsilon = Hashtbl.create (Hashtbl.length nfa.epsilon) in
   let _ = copy_table nfa.delta delta id in
-  let _ = copy_table nfa.epsilon epsilon id in 
-    { nfa with delta = delta;
-        epsilon = epsilon;
-	q = (Hashtbl.copy nfa.q) }
-	
+  let _ = copy_set nfa.epsilon epsilon id in
+  { nfa with delta = delta;
+    epsilon = epsilon;
+    q = (Hashset.copy nfa.q) }
+
 (** Extract a subNFA from a bigger NFA
     @param nfa NFA to (partially) copy
     @param s Start state for the result
@@ -591,10 +609,10 @@ let extract_nfa nfa s f =
 let merge_nfas (target : nfa) (source : nfa) : unit =
   let offset = target.next_q in
   let convert x = x + offset in
-    iter (fun source_q -> add target.q (convert source_q)) source.q;
-    copy_table source.delta target.delta convert;
-    copy_table source.epsilon target.epsilon convert;
-    target.next_q <- convert source.next_q
+  iter (fun source_q -> add target.q (convert source_q)) source.q;
+  copy_table source.delta target.delta convert;
+  copy_set source.epsilon target.epsilon convert;
+  target.next_q <- convert source.next_q
 
 
 (** Rebuild NFA with contiquous integer state space.
@@ -615,15 +633,16 @@ let normalize_nfa (nfa : nfa)
   let q       = create (size nfa.q) in
   let delta   = Hashtbl.create (Hashtbl.length nfa.delta) in
   let epsilon = Hashtbl.create (Hashtbl.length nfa.epsilon) in
-    iter (fun s -> add q (convert s)) nfa.q;
-    copy_table nfa.delta delta convert;
-    copy_table nfa.epsilon epsilon convert;
-    { s = convert nfa.s;
-      f = convert nfa.f;
-      delta = delta;
-      epsilon = epsilon;
-      q = q;
-      next_q = !curq}
+  iter (fun s -> add q (convert s)) nfa.q;
+  copy_table nfa.delta delta convert;
+  copy_set nfa.epsilon epsilon convert;
+  { s = convert nfa.s;
+    f = convert nfa.f;
+    delta = delta;
+    epsilon = epsilon;
+    q = q;
+    next_q = !curq}
+
 
 (* (\** Annotated NFA intersection using cross-product construction. *)
 (*     @param p1 A subset of [m1.q]  *)
@@ -800,8 +819,8 @@ let concat (a  : nfa)
   let _ = copy_table a.delta delta (fun x -> x) in
   let _ = copy_table b.delta delta convert in
   let epsilon = Hashtbl.create (Hashtbl.length a.delta + Hashtbl.length b.delta) in
-  let _ = copy_table a.epsilon epsilon (fun x -> x) in
-  let _ = copy_table b.epsilon epsilon convert in
+  let _ = copy_set a.epsilon epsilon (fun x -> x) in
+  let _ = copy_set b.epsilon epsilon convert in
   let result = { s = a.s; f = (convert b.f); delta = delta; epsilon = epsilon; q = q;
 	         next_q = a.next_q + b.next_q } in
   let curset = which_states epsilon a.f in
@@ -846,8 +865,8 @@ let union (a : nfa)
   let _ = copy_table a.delta delta (fun x -> x) in
   let _ = copy_table b.delta delta convert in
   let epsilon = Hashtbl.create (Hashtbl.length a.delta + Hashtbl.length b.delta) in
-  let _ = copy_table a.epsilon epsilon (fun x -> x) in
-  let _ = copy_table b.epsilon epsilon convert in
+  let _ = copy_set a.epsilon epsilon (fun x -> x) in
+  let _ = copy_set b.epsilon epsilon convert in
   let result = { s = 0; f = 0; delta = delta; epsilon = epsilon; q = q;
 	         next_q = a.next_q + b.next_q } in
   let newstart = new_state result in

@@ -45,12 +45,13 @@ open Nfa
 (** {6 Querying Dependency Graphs} *)
 
 (** [true] if [n] has no inbound edges *)
-let free (n : node) : bool = 
-  Hashtbl.length (n.inb) == 0
+let free (n : node) : bool =
+  Hashset.size (n.inb) == 0
+
 
 (** [true] if [n] has at least one outbound edge *)
 let not_done (n : node) : bool=
-  Hashtbl.length n.outb > 0
+  Hashset.size n.outb > 0
 
 (** [true] if [n] has either (1) any number of inbound intersect edges
     and no inbound concat edges; or (2) a single inbound concat edge and no
@@ -389,7 +390,8 @@ let solve_group (graph : graph)
       not (exists edge_from_group id_node.inb) in
 
   let group_copy = copy group in
-  let visited = create (Hashtbl.length group) in 
+  let visited = create (Hashset.size group) in
+
   let visit x = add visited x; remove group x in
   let visited x = mem visited x in
 
@@ -405,17 +407,17 @@ let solve_group (graph : graph)
 	  group_concat graph id rhs target
       | _ -> () 
     in
-      iter perform_intersect id_node.inb;
-      iter perform_concat id_node.outb;
-      visit id in 
+    iter perform_intersect id_node.inb;
+    iter perform_concat id_node.outb;
+    visit id in
 
-  let rec walk () = 
-    let topnodes = filter (fun x -> 
-			     is_top_node x && not (visited x)
-			  ) group  in
-      List.iter eliminate_top topnodes;
-      if Hashtbl.length group = 0 then ()
-      else walk () in
+  let rec walk () =
+    let topnodes = filter (fun x ->
+      is_top_node x && not (visited x)
+    ) group  in
+    List.iter eliminate_top topnodes;
+    if Hashset.size group = 0 then ()
+    else walk () in
 
   let _ = walk () in
   let solutions = enumerate_solutions group_copy graph in
