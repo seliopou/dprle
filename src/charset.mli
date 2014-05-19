@@ -1,5 +1,6 @@
 type set
 
+val default_set_size : int
 exception IllegalChar
 
 (* Utility Functions *)

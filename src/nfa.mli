@@ -34,6 +34,8 @@ val which_symbols  : ?create:bool -> 'a delta -> 'a ->'a -> charset
 val which_states   : ?create:bool -> 'a epsilon -> 'a -> 'a Hashset.hashset
 val copy_table     : ('a, ('a, 'b) Hashtbl.t) Hashtbl.t ->
                      ('c, ('c, 'b) Hashtbl.t) Hashtbl.t -> ('a -> 'c) -> unit
+val copy_set       : ('p, 'p Hashset.hashset) Hashtbl.t ->
+                     ('r, 'r Hashset.hashset) Hashtbl.t -> ('p -> 'r) -> unit
 val nested_ht_iter : ('a, 'b) Hashtbl.t ->
                      ('c, 'd) Hashtbl.t -> ('a -> 'b -> 'c -> 'd -> unit) -> unit
 val fmap           : 'a Hashset.hashset -> ('a -> 'b) -> ('a, 'b) Hashtbl.t
