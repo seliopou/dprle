@@ -9,7 +9,7 @@ type 'a delta   = ('a, ('a, charset) Hashtbl.t) Hashtbl.t
 type 'a epsilon = ('a, 'a Hashset.hashset) Hashtbl.t
 
 type state = int
-type nfa= {
+type nfa = {
    	mutable s : state;
    	mutable f : state;
    	mutable delta : state delta;
@@ -37,13 +37,6 @@ val copy_table     : ('a, ('a, 'b) Hashtbl.t) Hashtbl.t ->
 val nested_ht_iter : ('a, 'b) Hashtbl.t ->
                      ('c, 'd) Hashtbl.t -> ('a -> 'b -> 'c -> 'd -> unit) -> unit
 val fmap           : 'a Hashset.hashset -> ('a -> 'b) -> ('a, 'b) Hashtbl.t
-val new_nfa_states : state -> state -> nfa
-val new_state      : nfa -> state
-val add_state      : nfa -> state -> unit
-val add_trans      : nfa -> state -> symbol -> state -> unit
-val add_all_trans  : nfa -> state -> state -> unit
-val add_set_trans  : nfa -> state -> charset -> state -> unit
-val new_sigmastar  : unit -> nfa
 
 (* NFA Construction *)
 
