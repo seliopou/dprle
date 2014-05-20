@@ -243,29 +243,30 @@ transition: error
 		 Nfa.add_trans nfa (to_int_state $1) Nfa.Epsilon (to_int_state $3)
 	     }
            | IDENT ARROW IDENT ON symbolset
-	     { let nfa = match !curnfa with 
-		 | None ->
-		     let newnfa = Nfa.new_nfa_states 0 1 in
-		       curnfa := (Some newnfa);
-		       newnfa
-		 | Some nfa -> nfa
-	       in
-		 List.iter (fun x -> Nfa.add_trans nfa (to_int_state $1) 
-			                               (Nfa.Character x) (to_int_state $3)) $5
-	     }
-	   | IDENT ARROW IDENT ON NEG symbolset
-	     { let nfa = match !curnfa with 
-		 | None ->
-		     let newnfa = Nfa.new_nfa_states 0 1 in
-		       curnfa := (Some newnfa);
-		       newnfa
-		 | Some nfa -> nfa
-	       in
-	       let symbols = Charset.from_list $6 in
-	       let symbols = Charset.minus (Charset.create_full ()) symbols in
-		 Charset.iter (fun x -> Nfa.add_trans nfa (to_int_state $1) 
-				 (Nfa.Character x) (to_int_state $3)) symbols
-	     }
+         { let nfa = match !curnfa with
+         | None ->
+             let newnfa = Nfa.new_nfa_states 0 1 in
+               curnfa := (Some newnfa);
+               newnfa
+         | Some nfa -> nfa
+           in
+         List.iter (fun x -> Nfa.add_trans nfa (to_int_state $1)
+                                           (Nfa.Character x) (to_int_state $3)) $5
+         }
+       | IDENT ARROW IDENT ON NEG symbolset
+         { let nfa = match !curnfa with
+         | None ->
+             let newnfa = Nfa.new_nfa_states 0 1 in
+               curnfa := (Some newnfa);
+               newnfa
+         | Some nfa -> nfa
+           in
+           let open Nfa in
+           let symbols = Charset.from_list $6 in
+           let symbols = Charset.minus (Charset.create_full nfa.alpha_size) symbols in
+         Charset.iter (fun x -> Nfa.add_trans nfa (to_int_state $1)
+                 (Nfa.Character x) (to_int_state $3)) symbols
+         }
 
 symbolset: LBRACE RBRACE 
 	    { [] }

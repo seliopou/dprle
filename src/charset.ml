@@ -61,9 +61,9 @@ let digit_list_to_int (dl : string) : int =
 let create_empty () : set = 
   Hashset.create 0
 
-let create_full () : set =
-  let ret = Hashset.create 256 in
-    for i = 0 to 255 do Hashset.add ret i done;
+let create_full (size:int) : set =
+  let ret = Hashset.create size in
+    for i = 0 to (size-1) do Hashset.add ret i done;
     ret
 
 let copy = Hashset.copy
@@ -82,7 +82,7 @@ let from_list = Hashset.from_list
 
 let print_charset (s : set) = 
   if size s > 126 then
-    let negset = minus (create_full ()) s in
+    let negset = minus (create_full 256) s in
       Printf.printf "neg {";
       Hashset.iter (fun c-> Printf.printf "%s," (char_as_string c)) negset;
       Printf.printf "}"

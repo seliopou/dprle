@@ -16,6 +16,7 @@ type nfa = {
    	mutable epsilon : state epsilon;
    	mutable q : state Hashset.hashset;
    	mutable next_q : state;
+    mutable alpha_size : int
 }
 
 module StateSet: Set.S with type elt = state
@@ -42,7 +43,7 @@ val fmap           : 'a Hashset.hashset -> ('a -> 'b) -> ('a, 'b) Hashtbl.t
 
 (* NFA Construction *)
 
-val new_nfa_states : state -> state -> nfa
+val new_nfa_states : ?alpha_size:int -> state -> state -> nfa
 val new_state      : nfa -> state
 val add_state      : nfa -> state -> unit
 val add_trans      : nfa -> state -> symbol -> state -> unit
